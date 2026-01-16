@@ -215,8 +215,8 @@ _Last updated: 2025-12-17 22:19 UTC_
 ## Installation
 
 Requirements:
-- python >3.10
-- Nvidia GPU with enough ram to do what you need
+- python >3.12
+- GPU with enough ram to do what you need
 - python venv
 - git
 
