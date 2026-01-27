@@ -228,7 +228,7 @@ MacOS:
 ```bash
 git clone https://github.com/hexvalid/ai-toolkit-mps.git
 cd ai-toolkit
-python3 -m venv venv
+python3.12 -m venv venv
 source venv/bin/activate
 # install torch first
 pip3 install --no-cache-dir --pre torch torchvision --index-url https://download.pytorch.org/whl/nightly/cpu
@@ -264,14 +264,7 @@ You can do this by setting the environment variable `AI_TOOLKIT_AUTH` to super s
 the UI. You can set this when starting the UI like so:
 
 ```bash
-# Linux
 AI_TOOLKIT_AUTH=super_secure_password npm run build_and_start
-
-# Windows
-set AI_TOOLKIT_AUTH=super_secure_password && npm run build_and_start
-
-# Windows Powershell
-$env:AI_TOOLKIT_AUTH="super_secure_password"; npm run build_and_start
 ```
 
 
