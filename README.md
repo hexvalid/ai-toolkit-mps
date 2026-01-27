@@ -231,7 +231,7 @@ cd ai-toolkit
 python3.12 -m venv venv
 source venv/bin/activate
 # install torch first
-pip3 install --no-cache-dir --pre torch torchvision --index-url https://download.pytorch.org/whl/nightly/cpu
+pip3 install --no-cache-dir --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
 pip3 install -r requirements.txt
 ```
 
