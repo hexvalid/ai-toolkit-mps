@@ -39,6 +39,21 @@ def get_optimizer(
         # let net be the neural network you want to train
         # you can choose weight decay value based on your problem, 0 by default
         optimizer = Prodigy8bit(params, lr=use_lr, eps=1e-6, **optimizer_params)
+    elif lower_type == "prodigy_plus_schedulefree" or lower_type == "prodigy_plus":
+        from toolkit.optimizers.prodigy_plus_schedulefree import ProdigyPlusScheduleFree
+
+        print("Using ProdigyPlusScheduleFree optimizer")
+        use_lr = learning_rate
+        d0 = 1e-6
+        if use_lr < 0.1:
+            d0 = use_lr
+            use_lr = 1.0
+
+        print(f"Using lr {use_lr} and d0 {d0}")
+        if 'd0' in optimizer_params:
+            optimizer = ProdigyPlusScheduleFree(params, lr=use_lr, **optimizer_params)
+        else:
+            optimizer = ProdigyPlusScheduleFree(params, lr=use_lr, d0=d0, **optimizer_params)
     elif lower_type.startswith("prodigy"):
         from prodigyopt import Prodigy
 
@@ -61,18 +76,51 @@ def get_optimizer(
 
         optimizer = Adam8bit(params, lr=learning_rate, eps=1e-6, decouple=True, **optimizer_params)
     elif lower_type.endswith("8bit"):
-        import bitsandbytes
+        # Force fallback on MPS as bitsandbytes requires CUDA
+        from toolkit import device_utils
+        if device_utils.is_mps_available():
+            print("Bitsandbytes 8-bit optimizers are not supported on MPS. Falling back to standard optimizer.")
+            if lower_type == "adam8bit":
+                return torch.optim.Adam(params, lr=learning_rate, eps=1e-6, **optimizer_params)
+            elif lower_type == "adamw8bit":
+                return torch.optim.AdamW(params, lr=learning_rate, eps=1e-6, **optimizer_params)
+            elif lower_type == "lion8bit":
+                try:
+                    from lion_pytorch import Lion
+                    return Lion(params, lr=learning_rate, **optimizer_params)
+                except ImportError:
+                    raise ImportError("Please install lion_pytorch to use Lion optimizer -> pip install lion-pytorch")
+            else:
+                # Fallback for ademamix or unknown - generic AdamW
+                return torch.optim.AdamW(params, lr=learning_rate, eps=1e-6, **optimizer_params)
 
-        if lower_type == "adam8bit":
-            return bitsandbytes.optim.Adam8bit(params, lr=learning_rate, eps=1e-6, **optimizer_params)
-        if lower_type == "ademamix8bit":
-            return bitsandbytes.optim.AdEMAMix8bit(params, lr=learning_rate, eps=1e-6, **optimizer_params)
-        elif lower_type == "adamw8bit":
-            return bitsandbytes.optim.AdamW8bit(params, lr=learning_rate, eps=1e-6, **optimizer_params)
-        elif lower_type == "lion8bit":
-            return bitsandbytes.optim.Lion8bit(params, lr=learning_rate, **optimizer_params)
-        else:
-            raise ValueError(f'Unknown optimizer type {optimizer_type}')
+        try:
+            import bitsandbytes
+            if lower_type == "adam8bit":
+                return bitsandbytes.optim.Adam8bit(params, lr=learning_rate, eps=1e-6, **optimizer_params)
+            if lower_type == "ademamix8bit":
+                return bitsandbytes.optim.AdEMAMix8bit(params, lr=learning_rate, eps=1e-6, **optimizer_params)
+            elif lower_type == "adamw8bit":
+                return bitsandbytes.optim.AdamW8bit(params, lr=learning_rate, eps=1e-6, **optimizer_params)
+            elif lower_type == "lion8bit":
+                return bitsandbytes.optim.Lion8bit(params, lr=learning_rate, **optimizer_params)
+            else:
+                raise ValueError(f'Unknown optimizer type {optimizer_type}')
+        except ImportError:
+            print("Bitsandbytes not found or not supported. Falling back to standard optimizer.")
+            if lower_type == "adam8bit":
+                return torch.optim.Adam(params, lr=learning_rate, eps=1e-6, **optimizer_params)
+            elif lower_type == "adamw8bit":
+                return torch.optim.AdamW(params, lr=learning_rate, eps=1e-6, **optimizer_params)
+            elif lower_type == "lion8bit":
+                try:
+                    from lion_pytorch import Lion
+                    return Lion(params, lr=learning_rate, **optimizer_params)
+                except ImportError:
+                    raise ImportError("Please install lion_pytorch to use Lion optimizer -> pip install lion-pytorch")
+            else:
+                # Fallback for ademamix or unknown - generic AdamW
+                return torch.optim.AdamW(params, lr=learning_rate, eps=1e-6, **optimizer_params)
     elif lower_type == 'adam':
         optimizer = torch.optim.Adam(params, lr=float(learning_rate), eps=1e-6, **optimizer_params)
     elif lower_type == 'adamw':

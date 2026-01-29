@@ -215,37 +215,24 @@ _Last updated: 2025-12-17 22:19 UTC_
 ## Installation
 
 Requirements:
-- python >3.10
-- Nvidia GPU with enough ram to do what you need
+- python = 3.12
+- pip = 25.0
+- nodejs = 22
+- npm = 10
+- GPU with enough ram to do what you need
 - python venv
 - git
 
 
-Linux:
+MacOS:
 ```bash
-git clone https://github.com/ostris/ai-toolkit.git
+git clone https://github.com/hexvalid/ai-toolkit-mps.git
 cd ai-toolkit
-python3 -m venv venv
+python3.12 -m venv venv
 source venv/bin/activate
 # install torch first
-pip3 install --no-cache-dir torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0 --index-url https://download.pytorch.org/whl/cu126
+pip3 install --no-cache-dir --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
 pip3 install -r requirements.txt
-```
-
-For devices running **DGX OS** (including DGX Spark), follow [these](dgx_instructions.md) instructions.
-
-
-Windows:
-
-If you are having issues with Windows. I recommend using the easy install script at [https://github.com/Tavris1/AI-Toolkit-Easy-Install](https://github.com/Tavris1/AI-Toolkit-Easy-Install)
-
-```bash
-git clone https://github.com/ostris/ai-toolkit.git
-cd ai-toolkit
-python -m venv venv
-.\venv\Scripts\activate
-pip install --no-cache-dir torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0 --index-url https://download.pytorch.org/whl/cu126
-pip install -r requirements.txt
 ```
 
 
@@ -277,14 +264,7 @@ You can do this by setting the environment variable `AI_TOOLKIT_AUTH` to super s
 the UI. You can set this when starting the UI like so:
 
 ```bash
-# Linux
 AI_TOOLKIT_AUTH=super_secure_password npm run build_and_start
-
-# Windows
-set AI_TOOLKIT_AUTH=super_secure_password && npm run build_and_start
-
-# Windows Powershell
-$env:AI_TOOLKIT_AUTH="super_secure_password"; npm run build_and_start
 ```
 
 
